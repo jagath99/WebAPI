@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using WebAPI.Services;
 using WebAPI.Models;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace WebAPI.Controllers
 {
@@ -45,40 +46,58 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            Post? post = null;
-            using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            await connection.OpenAsync();
+            if (id <= 0)
+                return BadRequest("Invalid ID. ID must be a positive number.");
 
-            var command = new SqlCommand("SELECT Id, UserId, Title, Body FROM Posts WHERE Id = @Id", connection);
-            command.Parameters.AddWithValue("@Id", id);
-            var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            try
             {
-                post = new Post
+                Post? post = null;
+                using var connection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+                await connection.OpenAsync();
+
+                var command = new SqlCommand("SELECT Id, UserId, Title, Body FROM Posts WHERE Id = @Id", connection);
+                command.Parameters.AddWithValue("@Id", id);
+                var reader = await command.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
                 {
-                    Id = reader.GetInt32(0),
-                    UserId = reader.GetInt32(1),
-                    Title = reader.GetString(2),
-                    Body = reader.GetString(3)
-                };
+                    post = new Post
+                    {
+                        Id = reader.GetInt32(0),
+                        UserId = reader.GetInt32(1),
+                        Title = reader.GetString(2),
+                        Body = reader.GetString(3)
+                    };
+                    return Ok(post);
+                }
+
+                post = await _thirdPartyService.GetPostByIdAsync(id);
+                if (post == null) return NotFound();
+
+                await using var insertConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+                await insertConnection.OpenAsync();
+
+                var insert = new SqlCommand(@"INSERT INTO Posts (Id, UserId, Title, Body) 
+                                          VALUES (@Id, @UserId, @Title, @Body)", insertConnection);
+                insert.Parameters.AddWithValue("@Id", post.Id);
+                insert.Parameters.AddWithValue("@UserId", post.UserId);
+                insert.Parameters.AddWithValue("@Title", post.Title);
+                insert.Parameters.AddWithValue("@Body", post.Body);
+                await insert.ExecuteNonQueryAsync();
+
                 return Ok(post);
             }
-
-            post = await _thirdPartyService.GetPostByIdAsync(id);
-            if (post == null) return NotFound();
-
-            await using var insertConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
-            await insertConnection.OpenAsync();
-
-            var insert = new SqlCommand(@"INSERT INTO Posts (Id, UserId, Title, Body) 
-                                          VALUES (@Id, @UserId, @Title, @Body)", insertConnection);
-            insert.Parameters.AddWithValue("@Id", post.Id);
-            insert.Parameters.AddWithValue("@UserId", post.UserId);
-            insert.Parameters.AddWithValue("@Title", post.Title);
-            insert.Parameters.AddWithValue("@Body", post.Body);
-            await insert.ExecuteNonQueryAsync();
-
-            return Ok(post);
+            catch (SqlException ex)
+            {
+                return StatusCode(500, $"Database error: {ex.Message}");
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(503, $"Third-party API unreachable: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
         }
     }
 }
