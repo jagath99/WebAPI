@@ -27,18 +27,18 @@ that package Required for:
   Reverse engineering an existing database into EF models.
   Updating the database schema from code.
   
-#Step 03
-run migration commands to create tables
-`dotnet ef migrations add AddPostAndComment`
+# Step 03
+run migration commands to create tables <br>
+`dotnet ef migrations add AddPostAndComment` <br>
 `dotnet ef database update`
 then implement Controllers and thirdparty connections
 use Microsoft.Data.SqlClient to full control over SQL queries (no ORM).
 
-#Step 04
+# Step 04
 Then run code by Debug button and access data by Swagger UI.
 Add exceptions
 
-#Step 05
+# Step 05
 then `dotnet build` to build 
 run `dotnet run` deploy on localhost
 open swagger UI Through your browser 
