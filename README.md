@@ -1,13 +1,15 @@
 # WebAPI
 This is a simple integration of etching data from thirdparty api and store in a sql database.
 used [this](http://jsonplaceholder.typicode.com) as the thirdparty API.
+
 # Step 01
 Install visual studio and mssql if not already in your computer.
 Check whether the .NET installed or modify and run intaller for .NET
 start a new project with the template ASP.NET Core Web API visual studio.
 Remove initially generated .cs files
+
 # Step 02
-Define Models which are the Entities going to store and quarrey. [Post](./Models/Post.cs) , [Comment](./Models/Comment.cs)
+Define Models which are the Entities going to store and quarrey. [Post](./WebAPI/Models/Post.cs) , [Comment](./WebAPI/Models/Comment.cs)
 Connect Database to SQL Sever using SSMS and Creae a new data base
 add Connection String to the appSetting.json file
 ` "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=<databaseName>;Trusted_Connection=True;" `
