@@ -11,36 +11,36 @@ Remove initially generated .cs files
 # Step 02
 Define Models which are the Entities going to store and quarrey. [Post](./WebAPI/Models/Post.cs) , [Comment](./WebAPI/Models/Comment.cs)
 Connect Database to SQL Sever using SSMS and Creae a new data base
-add Connection String to the appSetting.json file
-` "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=<databaseName>;Trusted_Connection=True;" `
-Then DbContext created.
-install dependancies SqlServer by
-`dotnet add package Microsoft.EntityFrameworkCore.SqlServer`
-this package 
-  Enablecto use SQL Server as your database provider.
-  Translates LINQ queries into T-SQL.
-  Handles migrations for SQL Server.
-install tools package 
-`dotnet add package Microsoft.EntityFramworkCore.tools`
-that package Required for:
-  Migrations.
-  Reverse engineering an existing database into EF models.
+add Connection String to the appSetting.json file <br>
+` "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=<databaseName>;Trusted_Connection=True;" `<br>
+Then DbContext created.<br>
+install dependancies SqlServer by<br>
+`dotnet add package Microsoft.EntityFrameworkCore.SqlServer`<br>
+this package <br>
+  Enablecto use SQL Server as your database provider.<br>
+  Translates LINQ queries into T-SQL.<br>
+  Handles migrations for SQL Server.<br>
+install tools package <br>
+`dotnet add package Microsoft.EntityFramworkCore.tools`<br>
+that package Required for:<br>
+  Migrations.<br>
+  Reverse engineering an existing database into EF models.<br>
   Updating the database schema from code.
   
 # Step 03
 run migration commands to create tables <br>
 `dotnet ef migrations add AddPostAndComment` <br>
-`dotnet ef database update`
+`dotnet ef database update`<br>
 then implement Controllers and thirdparty connections
 use Microsoft.Data.SqlClient to full control over SQL queries (no ORM).
 
 # Step 04
-Then run code by Debug button and access data by Swagger UI.
+Then run code by Debug button and access data by Swagger UI.<br>
 Add exceptions
 
 # Step 05
-then `dotnet build` to build 
-run `dotnet run` deploy on localhost
-open swagger UI Through your browser 
+then `dotnet build` to build <br>
+run `dotnet run` deploy on localhost<br>
+open swagger UI Through your browser <br>
 `http://localhost:<port>/swagger`
 
